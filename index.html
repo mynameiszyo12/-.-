@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 장보기 재활게임</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main id="app">
+    <section id="start-screen" class="screen active" aria-labelledby="start-title">
+      <div class="panel hero">
+        <p class="badge">AI 기반 뇌졸중 환자용 일상생활 재활게임</p>
+        <h1 id="start-title">AI 장보기·주방 정리 재활게임</h1>
+        <p class="lead">
+          구매 목록을 기억하고, 필요한 물건을 찾은 뒤, 알맞은 위치에 정리하는 인지재활 게임입니다.
+        </p>
+
+        <div class="form-grid">
+          <label>
+            대상자 이름
+            <input id="user-name" type="text" placeholder="예: 대상자1" autocomplete="off" />
+          </label>
+
+          <label>
+            시작 난이도
+            <select id="difficulty-select">
+              <option value="1">1단계: 쉬움</option>
+              <option value="2" selected>2단계: 보통</option>
+              <option value="3">3단계: 약간 어려움</option>
+              <option value="4">4단계: 어려움</option>
+              <option value="5">5단계: 매우 어려움</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="option-row">
+          <label class="check-label">
+            <input id="timer-enabled" type="checkbox" />
+            제한시간 사용
+          </label>
+          <label class="check-label">
+            <input id="sound-enabled" type="checkbox" checked />
+            효과음 사용
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="start-btn" class="primary">게임 시작</button>
+          <button id="history-btn" class="secondary">회기 기록 보기</button>
+        </div>
+
+        <div class="notice">
+          <strong>주의:</strong> 본 게임은 재활훈련 보조 도구이며, 의학적 진단을 대체하지 않습니다.
+        </div>
+      </div>
+    </section>
+
+    <section id="memory-screen" class="screen" aria-labelledby="memory-title">
+      <div class="panel">
+        <div class="top-bar">
+          <button class="ghost" data-action="go-home">처음으로</button>
+          <div id="memory-status" class="status-pill">기억 단계</div>
+        </div>
+        <h2 id="memory-title">오늘 사야 할 물건을 기억하세요</h2>
+        <p class="instruction">잠시 후 목록이 사라집니다. 천천히 보고 기억해 주세요.</p>
+        <div id="memory-countdown" class="countdown">준비</div>
+        <div id="memory-list" class="memory-list"></div>
+        <button id="skip-memory-btn" class="secondary">바로 찾기 시작</button>
+      </div>
+    </section>
+
+    <section id="shopping-screen" class="screen" aria-labelledby="shopping-title">
+      <div class="panel wide">
+        <div class="top-bar">
+          <button class="ghost" data-action="go-home">처음으로</button>
+          <div class="status-group">
+            <span id="shopping-difficulty" class="status-pill">난이도</span>
+            <span id="shopping-timer" class="status-pill">시간 제한 없음</span>
+            <span id="shopping-score" class="status-pill">점수 0</span>
+          </div>
+        </div>
+
+        <h2 id="shopping-title">기억한 물건을 찾아 선택하세요</h2>
+        <p id="target-summary" class="instruction"></p>
+
+        <div class="button-row">
+          <button id="hint-btn" class="secondary">힌트 보기</button>
+          <button id="to-organize-btn" class="primary" disabled>정리 단계로 이동</button>
+        </div>
+
+        <div id="shopping-grid" class="shopping-grid" aria-live="polite"></div>
+        <div id="shopping-feedback" class="feedback" role="status"></div>
+      </div>
+    </section>
+
+    <section id="organize-screen" class="screen" aria-labelledby="organize-title">
+      <div class="panel wide">
+        <div class="top-bar">
+          <button class="ghost" data-action="go-home">처음으로</button>
+          <div id="organize-status" class="status-pill">정리 단계</div>
+        </div>
+
+        <h2 id="organize-title">선택한 물건을 알맞은 위치에 정리하세요</h2>
+        <p class="instruction">
+          물건을 드래그하거나, 물건을 클릭한 뒤 정리 위치를 클릭해도 됩니다.
+        </p>
+
+        <div class="organize-layout">
+          <div>
+            <h3>선택한 물건</h3>
+            <div id="selected-items-tray" class="tray"></div>
+          </div>
+
+          <div>
+            <h3>정리 위치</h3>
+            <div id="drop-zones" class="drop-zones"></div>
+          </div>
+        </div>
+
+        <div id="organize-feedback" class="feedback" role="status"></div>
+        <button id="finish-btn" class="primary" disabled>결과 보기</button>
+      </div>
+    </section>
+
+    <section id="result-screen" class="screen" aria-labelledby="result-title">
+      <div class="panel wide">
+        <div class="top-bar">
+          <button class="ghost" data-action="go-home">처음으로</button>
+          <div id="result-status" class="status-pill">결과 리포트</div>
+        </div>
+
+        <h2 id="result-title">훈련 결과</h2>
+
+        <div id="fatigue-box" class="fatigue-box">
+          <p class="instruction">오늘 훈련 후 피로도를 선택해 주세요.</p>
+          <label>
+            피로도
+            <select id="fatigue-select">
+              <option value="1">1점: 거의 피로하지 않음</option>
+              <option value="2" selected>2점: 약간 피로함</option>
+              <option value="3">3점: 보통</option>
+              <option value="4">4점: 많이 피로함</option>
+              <option value="5">5점: 매우 피로함</option>
+            </select>
+          </label>
+          <button id="generate-result-btn" class="primary">최종 결과 생성</button>
+        </div>
+
+        <div id="result-content" class="result-content" hidden></div>
+
+        <div class="button-row">
+          <button id="restart-btn" class="secondary" hidden>다시 하기</button>
+          <button id="result-history-btn" class="secondary" hidden>회기 기록 보기</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="history-screen" class="screen" aria-labelledby="history-title">
+      <div class="panel wide">
+        <div class="top-bar">
+          <button class="ghost" data-action="go-home">처음으로</button>
+          <button id="clear-history-btn" class="danger">기록 전체 삭제</button>
+        </div>
+
+        <h2 id="history-title">회기별 기록</h2>
+        <p class="instruction">
+          기록은 현재 브라우저의 localStorage에 저장됩니다. 다른 기기나 브라우저와 자동 동기화되지는 않습니다.
+        </p>
+
+        <div id="history-content"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./data.js"></script>
+  <script src="./aiDifficulty.js"></script>
+  <script src="./report.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
